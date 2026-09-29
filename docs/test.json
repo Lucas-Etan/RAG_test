@@ -1,0 +1,17 @@
+This is a project for testing RAG
+chunker.py is the script that splits source material into chunks
+split_by_line in chunker.py splits text by line and skips blank lines automatically
+Each chunk has three fields: id, text, and source, where id looks like chunk_000
+bulid_chunk.py is the entry script for building the index; running it re-splits docs/test.json and writes the index
+The split chunks are saved in index/chunks.json
+embedding_vector.py converts text into vectors by calling Ollama's /api/embed endpoint
+Vectors are L2-normalized before being returned, so cosine similarity can be computed with a plain dot product
+The name of the embedding model is set by the EMBED_MODEL environment variable in the .env file, and a missing value raises an error
+The address of the Ollama service is set by the OLLAMA_BASE_URL environment variable in the .env file
+retriever.py handles retrieval: it computes the cosine similarity between the question vector and every chunk and sorts by score from high to low
+SCORE_THRESHOLD in retriever.py is the similarity threshold, set to 0.35; chunks scoring below it are discarded
+The top_k parameter of the retrieve function defaults to 3, meaning at most three chunks are returned
+rag_answer.py assembles the retrieved chunks into a context and produces the final answer
+build_context in rag_answer.py formats each chunk as [id|source] text
+The QUESTIONS list at the top of main.py is the list of test questions; the program calls answer_with_context on each one and prints the answer
+When no chunk meets the threshold, answer_with_context returns the fixed message "资料中没有找到足够依据，无法回答该问题"
